@@ -50,13 +50,13 @@ public class GammaTest {
       {
         double y = expectedPair[1];
         double yActual = Gamma.gammaln(x);
-        assertEquals(msg, 0, Math.abs(relerr(y, yActual)), logTol);
+        assertEquals(msg, 0, relerr(y, yActual), logTol);
       }
       {
         double z = expectedPair[2];
         double zActual = Gamma.gamma(x);
         if (Double.isFinite(z)) {
-          assertEquals(msg, 0, Math.abs(relerr(z, zActual)), tol);
+          assertEquals(msg, 0, relerr(z, zActual), tol);
         } else {
           assertTrue(z == zActual);
         }
