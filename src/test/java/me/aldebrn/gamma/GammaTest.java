@@ -1,6 +1,7 @@
 package me.aldebrn.gamma;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.gson.Gson;
 import java.io.BufferedReader;
@@ -13,19 +14,23 @@ import org.junit.Test;
 #!/usr/bin/env python
 
 import numpy as np
-from scipy.special import gammaln
+from scipy.special import gammaln, gamma
 import json
 
 x = np.logspace(-10, 10, 2000)
 y = gammaln(x)
+z = gamma(x)
 
-with open("test.json", "w") as out: out.write(json.dumps(list(zip(x, y))))
+with open("test.json", "w") as out: out.write(json.dumps(list(zip(x, y, z))))
 */
 
 /**
  * Compare Gamma to Scipy
  */
 public class GammaTest {
+  private double logTol = 1e-12;
+  private double tol = 1e-12;
+
   private static double relerr(double expected, double actual) {
     return (actual == expected) ? 0 : Math.abs(actual - expected) / Math.abs(expected);
   }
@@ -41,9 +46,21 @@ public class GammaTest {
 
     for (double[] expectedPair : expected) {
       double x = expectedPair[0];
-      double y = expectedPair[1];
-      double yActual = Gamma.gammaln(x);
-      assertEquals("x=" + String.valueOf(x), 0, Math.abs(relerr(y, yActual)), 1e-12);
+      String msg = "x=" + String.valueOf(x);
+      {
+        double y = expectedPair[1];
+        double yActual = Gamma.gammaln(x);
+        assertEquals(msg, 0, Math.abs(relerr(y, yActual)), logTol);
+      }
+      {
+        double z = expectedPair[2];
+        double zActual = Gamma.gamma(x);
+        if (Double.isFinite(z)) {
+          assertEquals(msg, 0, Math.abs(relerr(z, zActual)), tol);
+        } else {
+          assertTrue(z == zActual);
+        }
+      }
     }
   }
 }
